@@ -13,6 +13,12 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  // Migrations use advisory locks, which pooled connections (e.g. Neon's
+  // "-pooler" endpoint, PgBouncer-based) don't reliably support — causes
+  // intermittent P1002 timeouts on "prisma migrate deploy". DIRECT_URL
+  // should point at the same database via its non-pooled endpoint.
+  // DATABASE_URL (pooled) is still what the running app queries through.
+  directUrl = env("DIRECT_URL")
 }
 
 enum ReportCategory {
