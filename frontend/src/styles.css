@@ -73,8 +73,14 @@ body,
   min-height: 100%;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
+  width: 100%;
+  overflow-x: hidden;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font);
@@ -268,6 +274,7 @@ button {
 
 .topbar__search {
   flex: 1;
+  min-width: 0;
   display: flex;
   justify-content: flex-end;
 }
@@ -301,6 +308,7 @@ button {
 
 .icon-btn {
   position: relative;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1366,6 +1374,28 @@ button {
 .composer__count--over {
   color: var(--chrome-text);
   font-weight: 700;
+}
+
+/* Give the actual typing area priority on narrow phones — the camera
+   shortcut is redundant with the paperclip's native file picker (which
+   already offers "Take Photo" on mobile), so it's the first thing to go. */
+@media (max-width: 400px) {
+  .composer-dock {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .composer {
+    padding: 6px 8px;
+  }
+
+  .composer__row {
+    gap: 2px;
+  }
+
+  .composer__camera {
+    display: none;
+  }
 }
 
 .emoji-picker {
