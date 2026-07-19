@@ -8,11 +8,13 @@ RUN apt-get update \
 
 WORKDIR /app
 
+# prisma/ has to be present before "npm ci" — it now triggers the
+# "postinstall" script (prisma generate), which needs the schema file.
 COPY package*.json ./
+COPY prisma ./prisma
 RUN npm ci
 
 COPY . .
-RUN npx prisma generate
 
 ENV PORT=4000
 EXPOSE 4000

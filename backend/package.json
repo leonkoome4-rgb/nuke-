@@ -30,6 +30,7 @@
     "clamscan": "^2.4.0"
   },
   "devDependencies": {
+    "@flydotio/dockerfile": "^0.7.10",
     "prisma": "^5.20.0"
   }
 }
