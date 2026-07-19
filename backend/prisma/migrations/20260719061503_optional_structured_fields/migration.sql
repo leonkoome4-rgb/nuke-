@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Report" ALTER COLUMN "politicianName" DROP NOT NULL,
+ALTER COLUMN "position" DROP NOT NULL,
+ALTER COLUMN "county" DROP NOT NULL,
+ALTER COLUMN "category" DROP NOT NULL;

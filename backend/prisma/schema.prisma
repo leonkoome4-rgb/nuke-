@@ -1,0 +1,107 @@
+// Prisma schema for the anonymous public-accountability platform.
+//
+// Provider is postgresql by default (matches docker-compose + production).
+// For local SQLite dev instead: change provider to "sqlite", set
+// DATABASE_URL="file:./dev.db", and replace the three enum types below with
+// String fields (SQLite has no native enum support) — validate the allowed
+// values in application code instead.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ReportCategory {
+  bribery
+  abuse_of_office
+  embezzlement
+  electoral_malpractice
+  other
+}
+
+enum ReportStatus {
+  unverified
+  corroborated
+  disputed
+  official_response
+}
+
+enum EvidenceFileType {
+  video
+  image
+  document
+}
+
+model Report {
+  id               String         @id @default(uuid())
+  // Nullable: the primary composer only asks for a message. Politician/
+  // position/county/category are optional structured tags a poster can add
+  // (via the admin-side or a future inline-tag affordance) — nothing here is
+  // required to post.
+  politicianName   String?
+  position         String?
+  county           String?
+  category         ReportCategory?
+  description      String
+  incidentDate     DateTime?
+  status           ReportStatus   @default(unverified)
+  officialResponse String?
+  flagCount        Int            @default(0)
+  likeCount        Int            @default(0)
+  hidden           Boolean        @default(false)
+
+  // Reports with attached evidence start unapproved and are excluded from the
+  // public feed until an admin reviews them. Text-only reports are approved
+  // immediately (but remain flaggable/auto-hideable like everything else).
+  approved         Boolean        @default(true)
+
+  // Returned once, in the POST /api/reports response, and required to attach
+  // evidence to this report. There are no accounts, so without this anyone
+  // could attach evidence to *any* existing public report id and knock it
+  // back into pending review as a griefing vector — this scopes evidence
+  // uploads to whoever holds the token from the original creation response.
+  // Never included in any GET response (public or admin).
+  evidenceToken    String         @default(uuid())
+
+  createdAt        DateTime       @default(now())
+
+  evidence         Evidence[]
+  replies          Reply[]
+
+  @@index([county])
+  @@index([position])
+  @@index([category])
+  @@index([status])
+  @@index([approved, hidden])
+  @@index([createdAt])
+}
+
+model Evidence {
+  id           String            @id @default(uuid())
+  reportId     String
+  report       Report            @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  fileUrl      String
+  fileType     EvidenceFileType
+  originalName String?
+  mimeType     String?
+  fileSize     Int?
+  createdAt    DateTime          @default(now())
+
+  @@index([reportId])
+}
+
+model Reply {
+  id        String   @id @default(uuid())
+  reportId  String
+  report    Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  content   String
+  flagCount Int      @default(0)
+  hidden    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([reportId])
+}
