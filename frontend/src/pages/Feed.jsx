@@ -370,75 +370,6 @@ export default function Feed() {
       </header>
 
       <main className="container">
-        {/* This is the home page's actual purpose — say something, right away. */}
-        <section className="composer--card">
-          {files.length > 0 && (
-            <div className="composer__files">
-              {files.map((f) => (
-                <span key={f.id} className="composer__file">
-                  {f.file.name}
-                  <button type="button" onClick={() => removeFile(f.id)} aria-label="Remove file">
-                    ×
-                  </button>
-                </span>
-              ))}
-            </div>
-          )}
-
-          {emojiOpen && <EmojiPicker onSelect={insertEmoji} />}
-
-          <div className="composer__row">
-            <label className="icon-btn composer__attach" aria-label="Attach file">
-              <Paperclip size={18} strokeWidth={2.25} />
-              <input type="file" multiple hidden onChange={handleFileSelect} />
-            </label>
-
-            <textarea
-              ref={textareaRef}
-              className="composer__input"
-              value={text}
-              onChange={(e) => {
-                setText(e.target.value);
-                autoResize();
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-              placeholder="Type anything, no questions asked"
-              rows={1}
-              autoFocus
-            />
-
-            <button type="button" className="icon-btn" onClick={() => setEmojiOpen((v) => !v)} aria-label="Emoji">
-              <Smile size={18} strokeWidth={2.25} />
-            </button>
-
-            <label className="icon-btn composer__camera" aria-label="Camera">
-              <Camera size={18} strokeWidth={2.25} />
-              <input type="file" accept="image/*,video/*" capture="environment" hidden onChange={handleFileSelect} />
-            </label>
-
-            <button
-              type="button"
-              className="composer__send"
-              disabled={!text.trim() || overLimit || sending}
-              onClick={handleSend}
-              aria-label="Send"
-            >
-              <Send size={16} strokeWidth={2.5} />
-            </button>
-          </div>
-
-          {charCount > MAX_DESCRIPTION_LENGTH - 200 && (
-            <span className={`composer__count ${overLimit ? "composer__count--over" : ""}`}>
-              {charCount}/{MAX_DESCRIPTION_LENGTH}
-            </span>
-          )}
-        </section>
-
         <ExplorePanel reports={reports} total={total} />
 
         <div className="feed">
@@ -480,6 +411,76 @@ export default function Feed() {
           )}
         </div>
       </main>
+
+      <div className="composer-dock">
+        <section className="composer--card">
+          <p className="composer__label">Say something — no questions asked</p>
+          {files.length > 0 && (
+            <div className="composer__files">
+              {files.map((f) => (
+                <span key={f.id} className="composer__file">
+                  {f.file.name}
+                  <button type="button" onClick={() => removeFile(f.id)} aria-label="Remove file">
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+
+          {emojiOpen && <EmojiPicker onSelect={insertEmoji} />}
+
+          <div className="composer__row">
+            <label className="icon-btn composer__attach" aria-label="Attach file">
+              <Paperclip size={18} strokeWidth={2.25} />
+              <input type="file" multiple hidden onChange={handleFileSelect} />
+            </label>
+
+            <textarea
+              ref={textareaRef}
+              className="composer__input"
+              value={text}
+              onChange={(e) => {
+                setText(e.target.value);
+                autoResize();
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
+              placeholder="Type here…"
+              rows={1}
+            />
+
+            <button type="button" className="icon-btn" onClick={() => setEmojiOpen((v) => !v)} aria-label="Emoji">
+              <Smile size={18} strokeWidth={2.25} />
+            </button>
+
+            <label className="icon-btn composer__camera" aria-label="Camera">
+              <Camera size={18} strokeWidth={2.25} />
+              <input type="file" accept="image/*,video/*" capture="environment" hidden onChange={handleFileSelect} />
+            </label>
+
+            <button
+              type="button"
+              className="composer__send"
+              disabled={!text.trim() || overLimit || sending}
+              onClick={handleSend}
+              aria-label="Send"
+            >
+              <Send size={16} strokeWidth={2.5} />
+            </button>
+          </div>
+
+          {charCount > MAX_DESCRIPTION_LENGTH - 200 && (
+            <span className={`composer__count ${overLimit ? "composer__count--over" : ""}`}>
+              {charCount}/{MAX_DESCRIPTION_LENGTH}
+            </span>
+          )}
+        </section>
+      </div>
 
       <ToastContainer toasts={toasts} dismiss={dismiss} />
 
