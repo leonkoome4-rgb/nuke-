@@ -149,6 +149,29 @@ multiple backend instances behind a load balancer.
 - Uploaded evidence has metadata stripped before storage (see above) so
   photos/videos don't leak GPS/device info about the submitter.
 
+## Production deployment (Vercel frontend + Railway backend)
+
+The backend needs `ffmpeg` and a persistent process (video transcoding, temp
+files, in-memory rate limiting) — that rules out plain serverless functions,
+so frontend and backend deploy as two separate services.
+
+**Backend (Railway, Render, Fly, or any Docker host):**
+1. Point the service at the `backend/` directory, using `backend/Dockerfile`
+   (installs `ffmpeg` + `exiftool`, runs `prisma generate`, and runs pending
+   migrations via `prisma migrate deploy` on every start).
+2. Set all the env vars from `backend/.env.example` — `DATABASE_URL` (a real
+   cloud Postgres, e.g. Neon/Supabase — **not** `localhost`),
+   `ADMIN_TOKEN`, `RATE_LIMIT_SECRET`, `S3_*` (Backblaze B2 in production),
+   `NEWSDATA_API_KEY`, and `CORS_ORIGIN` set to your Vercel frontend's URL.
+3. Note the backend's public URL once deployed (e.g.
+   `https://your-backend.up.railway.app`).
+
+**Frontend (Vercel):**
+1. Set the project's Root Directory to `frontend` — Vercel auto-detects Vite,
+   no `vercel.json` needed.
+2. Set `VITE_API_BASE_URL` to `<backend URL>/api` (from the step above).
+3. Deploy.
+
 ## Production deployment notes
 
 - Swap `S3_ENDPOINT` / credentials / `S3_PUBLIC_BASE_URL` for Backblaze B2 or

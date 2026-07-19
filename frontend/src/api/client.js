@@ -1,4 +1,9 @@
-const API_BASE = "/api";
+// Same-origin "/api" works for local dev (Vite proxy, see vite.config.js)
+// and any deployment where frontend + backend share a domain. Once they're
+// on separate hosts (Vercel frontend + Railway backend), set
+// VITE_API_BASE_URL to the backend's full URL, e.g.
+// https://your-backend.up.railway.app/api
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api";
 
 async function handleResponse(res) {
   if (res.status === 204) return null;
