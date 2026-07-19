@@ -21,8 +21,7 @@ import { avatarColor } from "../lib/avatar.js";
 import { MAX_DESCRIPTION_LENGTH } from "../constants.js";
 import PostCard from "../components/PostCard.jsx";
 import SkeletonCard from "../components/SkeletonCard.jsx";
-import Sidebar from "../components/Sidebar.jsx";
-import NewsSidebar from "../components/NewsSidebar.jsx";
+import ExplorePanel from "../components/ExplorePanel.jsx";
 import EmojiPicker from "../components/EmojiPicker.jsx";
 import WelcomeModal from "../components/WelcomeModal.jsx";
 import { useToasts, ToastContainer } from "../components/Toast.jsx";
@@ -370,53 +369,9 @@ export default function Feed() {
         </div>
       </header>
 
-      <div className="layout">
-        <NewsSidebar />
-
-        <main className="feed">
-          {loading && (
-            <>
-              <SkeletonCard />
-              <SkeletonCard />
-              <SkeletonCard />
-            </>
-          )}
-
-          {error && <p className="feed__error">{error}</p>}
-
-          {!loading && !error && visibleReports.length === 0 && (
-            <div className="empty-state">
-              <p className="empty-state__title">Nothing here yet</p>
-              <p className="empty-state__body">Be the first to say something.</p>
-            </div>
-          )}
-
-          {!loading &&
-            visibleReports.map((report, i) => (
-              <PostCard
-                key={report.id}
-                report={report}
-                onToast={toast}
-                style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}
-                highlighted={highlightedId === report.id}
-                startExpanded={highlightedId === report.id}
-              />
-            ))}
-
-          {!loading && hasMore && (
-            <div className="load-more">
-              <button type="button" onClick={loadMore} disabled={loadingMore}>
-                {loadingMore ? "Loading…" : "Load more"}
-              </button>
-            </div>
-          )}
-        </main>
-
-        <Sidebar reports={reports} total={total} />
-      </div>
-
-      <div className="composer-dock">
-        <div className="composer">
+      <main className="container">
+        {/* This is the home page's actual purpose — say something, right away. */}
+        <section className="composer--card">
           {files.length > 0 && (
             <div className="composer__files">
               {files.map((f) => (
@@ -454,6 +409,7 @@ export default function Feed() {
               }}
               placeholder="Type anything, no questions asked"
               rows={1}
+              autoFocus
             />
 
             <button type="button" className="icon-btn" onClick={() => setEmojiOpen((v) => !v)} aria-label="Emoji">
@@ -481,8 +437,49 @@ export default function Feed() {
               {charCount}/{MAX_DESCRIPTION_LENGTH}
             </span>
           )}
+        </section>
+
+        <ExplorePanel reports={reports} total={total} />
+
+        <div className="feed">
+          {loading && (
+            <>
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
+            </>
+          )}
+
+          {error && <p className="feed__error">{error}</p>}
+
+          {!loading && !error && visibleReports.length === 0 && (
+            <div className="empty-state">
+              <p className="empty-state__title">Nothing here yet</p>
+              <p className="empty-state__body">Be the first to say something.</p>
+            </div>
+          )}
+
+          {!loading &&
+            visibleReports.map((report, i) => (
+              <PostCard
+                key={report.id}
+                report={report}
+                onToast={toast}
+                style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}
+                highlighted={highlightedId === report.id}
+                startExpanded={highlightedId === report.id}
+              />
+            ))}
+
+          {!loading && hasMore && (
+            <div className="load-more">
+              <button type="button" onClick={loadMore} disabled={loadingMore}>
+                {loadingMore ? "Loading…" : "Load more"}
+              </button>
+            </div>
+          )}
         </div>
-      </div>
+      </main>
 
       <ToastContainer toasts={toasts} dismiss={dismiss} />
 
